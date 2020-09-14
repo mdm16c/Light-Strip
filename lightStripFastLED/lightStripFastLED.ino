@@ -13,43 +13,59 @@ unsigned long key_value = 0;
 CRGB leds[NUMPIXELS];
 int brightnessDelta = 4;
 int brightness = 125;
-int colorDelta = 1;
+int colorDelta = 2;
 int effect = 3;
 int lastEffect = -1;
 
 //animation vars
-int diy1 = 0;
+bool diy1Playing = false;
 CRGB LED0Color = CRGB(0, 0, 0);
 int diy2 = 0;
 int diy3 = 0;
 int diy4 = 0;
+int diy5Counter = 0;
+bool jump3Switch = false;
+bool jump7Switch = false;
+CRGB jump7Color1 = CRGB(0,0,0);
+CRGB jump7Color2 = CRGB(0,0,0);
+CRGB jump7Color3 = CRGB(0,0,0);
+CRGB jump7Color4 = CRGB(0,0,0);
+CRGB jump7Color5 = CRGB(0,0,0);
+CRGB jump7Color6 = CRGB(0,0,0);
+CRGB jump7Color7 = CRGB(0,0,0);
+CRGB jump7Color8 = CRGB(0,0,0);
+CRGB jump7Color9 = CRGB(0,0,0);
+CRGB jump7Color10 = CRGB(0,0,0);
 int quick = 0;
 int slow = 0;
 int chromaDelta = 6;
+int fade3 = 125;
+bool fade3Switch = false;
+CRGB fade7Color = CRGB(0,0,0);
 bool playing = true;
 
 //colors
 //accepts colors in green, red, blue
 CRGB red = CRGB(0, 255, 0);
 CRGB green = CRGB(255, 0, 0);
-CRGB lightGreen = CRGB(204, 0, 102);
+CRGB lightGreen = CRGB(205, 50, 50);
 CRGB blue = CRGB(0, 0, 255);
 CRGB lightBlue = CRGB(128, 0, 255);
 CRGB skyBlue = CRGB(206, 135, 250);
-CRGB lightSkyBlue = CRGB(216, 173, 230);
-CRGB turquoise = CRGB(206, 0, 209);
+CRGB lightSkyBlue = CRGB(210, 150, 50);
+CRGB turquoise = CRGB(204, 0, 102);
 CRGB lightTurquoise = CRGB(224, 64, 208);
-CRGB darkTurquoise = CRGB(139, 0, 139);
+CRGB darkTurquoise = CRGB(50, 90, 139);
 CRGB white = CRGB(254, 254, 254);
-CRGB darkOrange = CRGB(128, 255, 0);
-CRGB orange = CRGB(153, 255, 51);
-CRGB lightOrange = CRGB(178, 255, 102);
-CRGB yellow = CRGB(255, 255, 0);
+CRGB darkOrange = CRGB(75, 255, 0);
+CRGB orange = CRGB(100, 255, 0);
+CRGB lightOrange = CRGB(125, 255, 0);
+CRGB yellow = CRGB(200, 255, 0);
 CRGB purple = CRGB(0, 153, 153);
 CRGB lightPurple = CRGB(0, 204, 102);
 CRGB pink = CRGB(105, 255, 180);
-CRGB lightPink = CRGB(192, 255, 203);
-CRGB darkPink = CRGB(20, 255, 147);
+CRGB lightPink = CRGB(200, 255, 50);
+CRGB darkPink = CRGB(50, 255, 100);
 CRGB indigo = CRGB(0, 75, 130);
 
 void setup() {
@@ -61,7 +77,7 @@ void setup() {
   irrecv.enableIRIn();
 
   //blink arduino LED on input recieved
-  irrecv.blink13(true);
+  //irrecv.blink13(true);
 
   //FastLED NeoPixel
   FastLED.addLeds<WS2812B, PIN>(leds, NUMPIXELS);
@@ -411,58 +427,29 @@ void loop() {
       //DIY 1 [9][1]
       case 30:                            // leds[i].fadeLightBy(64) is decrease in brightness by 25%
         if (lastEffect != 30) {
-
-          if (leds[0].r != 0 || leds[0].g != 0 || leds[0].b != 0) {
-            LED0Color = leds[0];
-          }
-          else {
-            LED0Color = red;
-          }
+          diy1Playing = true;
           FastLED.clear();
           leds[0] = LED0Color.fadeLightBy(102);
-          diy1 = 0;
-//          FastLED.show();
+          leds[1] = LED0Color.fadeLightBy(77);
+          leds[2] = LED0Color.fadeLightBy(51);
+          leds[3] = LED0Color.fadeLightBy(26);
+          leds[4] = LED0Color;
+          leds[5] = LED0Color.fadeLightBy(26);
+          leds[6] = LED0Color.fadeLightBy(51);
+          leds[7] = LED0Color.fadeLightBy(77);
+          leds[8] = LED0Color.fadeLightBy(102);
+          
         }
         else {
-          if (diy1 < 9 || diy1 == NUMPIXELS) {
-            for (int i = diy1+1; i > 0; i--) {
-              if (i > NUMPIXELS) {
-                continue;
-              }
-              leds[i] = leds[i-1];
-            }
-            if (diy1 == 0 || diy1 == 4) {
-              leds[diy1] = LED0Color.fadeLightBy(77);
-            }
-            else if (diy1 == 1 || diy1 == 5) {
-              leds[diy1] = LED0Color.fadeLightBy(51);
-            }
-            else if (diy1 == 2 || diy1 == 6) {
-              leds[diy1] = LED0Color.fadeLightBy(26);
-            }
-            else if (diy1 == 3) {
-              leds[diy1] = LED0Color;
-            }
-            else if (diy1 == NUMPIXELS || diy1 == 7) {
-              leds[diy1] = LED0Color.fadeLightBy(102);
-            }
+          CRGB lastLED = leds[NUMPIXELS];
+          for (int i = NUMPIXELS; i > 0; i--) {
+            leds[i] = leds[i-1];
           }
-          else {
-            for (int i = NUMPIXELS; i > 0; i--) {
-              leds[i] = leds[i-1];
-            }
-          }
-        }
-        if (diy1 < NUMPIXELS) {
-          diy1++;
-        }
-        else {
-          diy1 = 0;
+          leds[0] = lastLED;
         }
         
         FastLED.show();
-        delay(35);
-        Serial.println(diy1);
+        delay(75);
         lastEffect = 30;
         break;
 
@@ -850,6 +837,588 @@ void loop() {
         delay(40);
         lastEffect = 35;
         break;
+
+      //Flash [10][4]
+      case 36:
+        if (lastEffect != 36 || leds[0] == CRGB(0,0,0)) {
+          fill_solid(leds, NUMPIXELS, LED0Color);
+        }
+        else {
+          FastLED.clear();
+        }
+        
+        FastLED.show();
+        delay(50);
+        lastEffect = 36;
+        break;
+
+      //Auto [9][4]
+      case 37:
+        if (lastEffect != 37 || (!leds[0])) {
+          FastLED.clear();
+          for (int i = 0; i < NUMPIXELS; i+=2) {
+            leds[i] = LED0Color;
+          }
+        }
+        else {
+          FastLED.clear();
+          for (int i = 1; i < NUMPIXELS; i+=2) {
+            leds[i] = LED0Color;
+          }
+        }
+        
+        FastLED.show();
+        delay(75);
+        lastEffect = 37;
+        break;
+
+      //DIY 5 [10][2]
+      case 38:
+        diy5Counter++;
+        if (diy5Counter == 8) {
+          FastLED.clear();
+          diy5Counter = 0;
+          for (long i = 0; i < random(115,130); i++) {
+            long color = random(1,4);
+            if (color == 1) {
+              long index = random(0, NUMPIXELS-1);
+              leds[index] = darkTurquoise;
+              leds[index].fadeLightBy(random(75,250));
+            }
+            else if (color == 2) {
+              long index = random(0, NUMPIXELS-1);
+              leds[index] = lightGreen;
+              leds[index].fadeLightBy(random(75,250));
+            }
+            else {
+              long index = random(0, NUMPIXELS-1);
+              leds[index] = lightOrange;
+              leds[index].fadeLightBy(random(75,250));
+            }
+          }
+        }
+        
+        FastLED.show();
+        delay(random(150,400));
+        lastEffect = 38;
+        break;
+
+      //Jump 3 [11][1]
+      case 39:
+        if (lastEffect != 39) {
+          FastLED.clear();
+          leds[0] = red;
+          
+          leds[1] = red;
+          leds[2] = red;
+          leds[27] = blue;
+          leds[28] = blue;
+          
+          leds[29] = blue;
+          leds[30] = blue;
+
+          leds[31] = blue;
+          leds[32] = blue;
+          leds[57] = yellow;
+          leds[58] = yellow;
+          
+          leds[59] = yellow;
+          leds[60] = yellow;
+
+          leds[61] = yellow;
+          leds[62] = yellow;
+          leds[87] = red;
+          leds[88] = red;
+          
+          leds[89] = red;
+          leds[90] = red;
+
+          leds[91] = red;
+          leds[92] = red;
+          leds[117] = blue;
+          leds[118] = blue;
+          
+          leds[119] = blue;
+          leds[120] = blue;
+
+          leds[121] = blue;
+          leds[122] = blue;
+          leds[147] = yellow;
+          leds[148] = yellow;
+          
+          leds[149] = yellow;
+          
+          jump3Switch = false;
+        }
+        else {
+          if (!jump3Switch) {
+            //normal
+            for (int i = 14; i > 0; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = red;
+              }
+            }
+            for (int i = 15; i < 29; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = blue;
+              }
+            }
+            for (int i = 44; i > 30; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = blue;
+              }
+            }
+            for (int i = 45; i < 59; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = yellow;
+              }
+            }
+            for (int i = 74; i > 60; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = yellow;
+              }
+            }
+            for (int i = 75; i < 89; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = red;
+              }
+            }
+            for (int i = 104; i > 90; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = red;
+              }
+            }
+            for (int i = 105; i < 119; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = blue;
+              }
+            }
+            for (int i = 134; i > 120; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = blue;
+              }
+            }
+            for (int i = 135; i < 149; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = yellow;
+              }
+            }
+            if (leds[14]) {
+                jump3Switch = true;
+            }
+          }
+          else {
+            //alt
+            for (int i = 0; i < 14; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = purple;
+              }
+            }
+            for (int i = 29; i > 15; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = purple;
+              }
+            }
+            for (int i = 30; i < 44; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = green;
+              }
+            }
+            for (int i = 59; i > 45; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = green;
+              }
+            }
+            for (int i = 60; i < 74; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = darkOrange;
+              }
+            }
+            for (int i = 89; i > 75; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = darkOrange;
+              }
+            }
+            for (int i = 90; i < 104; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = purple;
+              }
+            }
+            for (int i = 119; i > 105; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = purple;
+              }
+            }
+            for (int i = 120; i < 134; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = green;
+              }
+            }
+            for (int i = 149; i > 135; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = green;
+              }
+            }
+            if (leds[0]) {
+                jump3Switch = false;
+                //Serial.println("switching to normal");
+            }
+          }
+        }
+        FastLED.show();
+        delay(37);
+        lastEffect = 39;
+        break;
+
+      //Jump 7 [11][2]
+      case 40:
+        if (lastEffect != 40) {
+          FastLED.clear();
+          leds[0] = jump7Color1;
+          
+          leds[1] = jump7Color1;
+          leds[2] = jump7Color1;
+          leds[27] = jump7Color2;
+          leds[28] = jump7Color2;
+          
+          leds[29] = jump7Color2;
+          leds[30] = jump7Color3;
+
+          leds[31] = jump7Color3;
+          leds[32] = jump7Color3;
+          leds[57] = jump7Color4;
+          leds[58] = jump7Color4;
+          
+          leds[59] = jump7Color4;
+          leds[60] = jump7Color5;
+
+          leds[61] = jump7Color5;
+          leds[62] = jump7Color5;
+          leds[87] = jump7Color6;
+          leds[88] = jump7Color6;
+          
+          leds[89] = jump7Color6;
+          leds[90] = jump7Color7;
+
+          leds[91] = jump7Color7;
+          leds[92] = jump7Color7;
+          leds[117] = jump7Color8;
+          leds[118] = jump7Color8;
+          
+          leds[119] = jump7Color8;
+          leds[120] = jump7Color9;
+
+          leds[121] = jump7Color9;
+          leds[122] = jump7Color9;
+          leds[147] = jump7Color10;
+          leds[148] = jump7Color10;
+          
+          leds[149] = jump7Color10;
+          
+          jump7Switch = false;
+        }
+        else {
+          if (!jump7Switch) {
+            //normal
+            for (int i = 14; i > 0; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color1;
+              }
+            }
+            for (int i = 15; i < 29; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color2;
+              }
+            }
+            for (int i = 44; i > 30; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color3;
+              }
+            }
+            for (int i = 45; i < 59; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color4;
+              }
+            }
+            for (int i = 74; i > 60; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color5;
+              }
+            }
+            for (int i = 75; i < 89; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color6;
+              }
+            }
+            for (int i = 104; i > 90; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color7;
+              }
+            }
+            for (int i = 105; i < 119; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color8;
+              }
+            }
+            for (int i = 134; i > 120; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color9;
+              }
+            }
+            for (int i = 135; i < 149; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color10;
+              }
+            }
+            if (leds[14]) {
+                jump7Switch = true;
+            }
+          }
+          else {
+            //alt
+            for (int i = 0; i < 14; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color1;
+              }
+            }
+            for (int i = 29; i > 15; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color2;
+              }
+            }
+            for (int i = 30; i < 44; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color3;
+              }
+            }
+            for (int i = 59; i > 45; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color4;
+              }
+            }
+            for (int i = 60; i < 74; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color5;
+              }
+            }
+            for (int i = 89; i > 75; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color6;
+              }
+            }
+            for (int i = 90; i < 104; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color7;
+              }
+            }
+            for (int i = 119; i > 105; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color8;
+              }
+            }
+            for (int i = 120; i < 134; i++) {
+              leds[i] = leds[i+1];
+              leds[i+1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color9;
+              }
+            }
+            for (int i = 149; i > 135; i--) {
+              leds[i] = leds[i-1];
+              leds[i-1] = CRGB(0,0,0);
+              if (leds[i]) {
+                leds[i] = jump7Color10;
+              }
+            }
+            if (leds[0]) {
+                jump7Switch = false;
+                //Serial.println("switching to normal");
+            }
+          }
+        }
+        FastLED.show();
+        delay(37);
+        lastEffect = 40;
+        break;
+
+      //Fade 3 [11][3]
+      case 41:
+        if (lastEffect != 41) {
+          FastLED.clear();
+          fill_solid(leds, NUMPIXELS, LED0Color);
+          FastLED.setBrightness(100);
+          fade3Switch = false;
+        }
+        else {
+          if (!fade3Switch) {
+            fade3 -= 1;
+            if (fade3 == 1) {
+              fade3Switch = true;
+            }
+          }
+          else {
+            fade3 += 1;
+            if (fade3 == 100) {
+              fade3Switch = false;
+            }
+          }
+          FastLED.setBrightness(fade3);
+        }
+        
+        FastLED.show();
+        if (fade3 < 25) {
+          delay(75);
+        }
+        else if (fade3 >= 25 && fade3 < 50) {
+          delay(60);
+        }
+        else if (fade3 >= 50 && fade3 < 75) {
+          delay(40);
+        }
+        else {
+          delay(25);
+        }
+        lastEffect = 41;
+        break;
+
+      //Fade 7 [11][4]
+      case 42:
+        if (lastEffect != 42) {
+          FastLED.clear();
+          fill_solid(leds, NUMPIXELS, CRGB(random(1,254),random(1,254),random(1,254)));
+          fade7Color = CRGB(random(1,254),random(1,254),random(1,254));
+        }
+        else {
+          if (leds[0].r < fade7Color.r) {
+            for (int i = 0; i < NUMPIXELS; i++) {
+              leds[i].r += 1;
+            }
+          }
+          else if (leds[0].r > fade7Color.r) {
+            for (int i = 0; i < NUMPIXELS; i++) {
+              leds[i].r -= 1;
+            }
+          }
+          if (leds[0].g < fade7Color.g) {
+            for (int i = 0; i < NUMPIXELS; i++) {
+              leds[i].g += 1;
+            }
+          }
+          else if (leds[0].g > fade7Color.g) {
+            for (int i = 0; i < NUMPIXELS; i++) {
+              leds[i].g -= 1;
+            }
+          }
+          if (leds[0].b < fade7Color.b) {
+            for (int i = 0; i < NUMPIXELS; i++) {
+              leds[i].b += 1;
+            }
+          }
+          else if (leds[0].b > fade7Color.b) {
+            for (int i = 0; i < NUMPIXELS; i++) {
+              leds[i].b -= 1;
+            }
+          }
+          if (leds[0].r == fade7Color.r && leds[0].g == fade7Color.g && leds[0].b == fade7Color.b) {
+            fade7Color = CRGB(random(1,254),random(1,254),random(1,254));
+          }
+        }
+        
+        FastLED.show();
+        delay(25);
+        lastEffect = 42;
+        break;
+
+      //Diy 6 [11][4]
+      case 43:
+        FastLED.clear();
+        fill_solid(leds, NUMPIXELS, CRGB(random(1,254),random(1,254),random(1,254)));
+        FastLED.show();
+        effect = -1;
+        lastEffect = 43;
+//        Serial.print("r: "); 
+//        Serial.print(leds[0].r);
+//        Serial.print(" g: ");
+//        Serial.print(leds[0].g);
+//        Serial.print(" b: ");
+//        Serial.println(leds[0].b);
+        break;
     }
   }
 
@@ -861,7 +1430,19 @@ void loop() {
     if (results.value == 0XFFFFFFFF) {
       results.value = key_value;
     }
-    Serial.println(results.value, HEX);
+    //Serial.println(results.value, HEX);
+
+    bool newColor = false;
+    for (int i = 0; i < NUMPIXELS; i++) {
+            if (leds[i].r != 0 || leds[i].g != 0 || leds[i].b != 0) {
+              LED0Color = leds[i];
+              newColor = true;
+              break;
+            }
+          }
+          if (!newColor) {
+            LED0Color = red;
+          }
 
     switch (results.value) {
 
@@ -1072,11 +1653,69 @@ void loop() {
         playing = true;
         break;
 
+      //Flash [10][4]
+      case 0xFFD02F:
+        effect = 36;
+        playing = true;
+        break;
+
+      //Auto [9][4]
+      case 0xFFF00F:
+        effect = 37;
+        playing = true;
+        break;
+
+      //DIY 5 [10][2]
+      case 0xFF906F:
+        effect = 38;
+        playing = true;
+        break;
+
+      //Jump 3 [11][1]
+      case 0xFF20DF:
+        effect = 39;
+        playing = true;
+        break;
+
+      //Jump 7 [11][2]
+      case 0xFFA05F:
+        effect = 40;
+        playing = true;
+        jump7Color1 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color2 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color3 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color4 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color5 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color6 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color7 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color8 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color9 = CRGB(random(1,254),random(1,254),random(1,254));
+        jump7Color10 = CRGB(random(1,254),random(1,254),random(1,254));
+        break;
+
+      //Fade 3 [11][3]
+      case 0xFF609F:
+        effect = 41;
+        playing = true;
+        break;
+
+      //Fade 7 [11][4]
+      case 0xFFE01F:
+        effect = 42;
+        playing = true;
+        break;
+
+      //DIY 6 [10][3]
+      case 0xFF50AF:
+        effect = 43;
+        playing = true;
+        break;
+
       //command not recognized
       default:
-        effect = -1;
-        Serial.print(results.value, HEX);
-        Serial.println(" is not a recognized command.");
+        //effect = -1;
+        //Serial.print(results.value, HEX);
+        //Serial.println(" is not a recognized command.");
         break;
     }
 
